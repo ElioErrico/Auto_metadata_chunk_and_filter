@@ -8,7 +8,7 @@ class MySettings(BaseModel):
     rule_2: str  = "2) Il titolo deve includere le parole chiave contenute nel testo"
     rule_3: str  = ""
     n_of_chunk_for_one_title: int = 5
-    prompt_for_question_generation: str= "Genera 2 domande concise e mirate la cui risposta è contenuta nel seguente testo:"
+    prompt_for_question_generation: str= "Genera 2 domande molto concise la cui risposta \u00e8 contenuta nel seguente testo (per creare le domande fai riferimento al titolo):"
 
 
 @plugin
