@@ -1,5 +1,17 @@
+
 from cat.mad_hatter.decorators import hook
 from langchain.docstore.document import Document
+
+
+@hook  # default priority = 1
+def before_agent_starts(agent_input, cat):
+
+    #TODO: fare selezionare il testo da mettere tra parentesi direttamente dalla lista di metadata 
+    changed_question = cat.llm(f"Analizza la conversazione:\n '{agent_input['chat_history']}'\n Aggiungi tra parentesi l'oggetto della domanda (esplicito o implicito) a valle di:'{agent_input['input']}. Il tuo output sarà: ' {agent_input['input']} (Oggetto della discussione esplicito nella domanda o implicito nella conversazione) ")
+    agent_input['input'] = changed_question
+
+    return agent_input
+
 
 @hook
 def after_rabbithole_splitted_text(chunks, cat):
@@ -45,3 +57,5 @@ def after_rabbithole_splitted_text(chunks, cat):
         chunks.append(concatenated_new_document) 
     
     return chunks
+
+    # La funzione ora modifica direttamente i metadati dei chunk in 'chunks'
