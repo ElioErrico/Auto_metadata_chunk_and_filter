@@ -1,49 +1,38 @@
 
 from cat.mad_hatter.decorators import hook
-import os
 
-def stampa(testo, nome_file, percorso="C:\\Users\\elio.errico\\Desktop\\python\\cheshire-cat-main\\core-main\\core"):
-    
-    percorso_completo = os.path.join(percorso, nome_file)
-    
-    # Assicurarsi che la cartella esista, altrimenti crearla
-    if not os.path.exists(percorso):
-        os.makedirs(percorso)
-    
-    # Scrivere il testo nel file
-    with open(percorso_completo, 'w', encoding='utf-8') as file:
-        file.write(testo)  
-
-    return 
-
-
-
-@hook  # default priority = 1
-def before_rabbithole_splits_text(doc, cat):
-
-    # nome_file="01_before_rabbithole_splits_text.txt"
-    nome_file=str(doc[0].metadata['source'])
-    content = str(doc[0].page_content)
-
-
-    title=cat.llm(f"Trova un titolo conciso di 4 parole che descriva al meglio il seguente testo:\n {content}")
-    doc[0].metadata["title"]=title
-    metadata =str(doc[0].metadata)
-    # titolo = "titolo= " + str(doc[0].metadata['title'])
-    # testo=  content + "\n \n \n \n \n \n" + metadata + "\n \n \n \n \n \n" + titolo
-    # stampa(testo,nome_file)
-
-    return doc
-
-
-@hook  # default priority = 1
+@hook
 def after_rabbithole_splitted_text(chunks, cat):
 
-    for chunk in chunks:
-        titolo_chunk =str(chunk.metadata['title'])
-        testo_chunk=str(chunk.page_content)
-        testo_chunk_con_titolo=titolo_chunk+":\n"+testo_chunk
+    concatenated_chunks_list = []
 
-        chunk.page_content=testo_chunk_con_titolo
+    settings = cat.mad_hatter.get_plugin().load_settings()
+    n_of_chunk_for_one_title = settings["n_of_chunk_for_one_title"]
+    text_to_search_the_title = settings["text_to_search_the_title"]
+    rule_1=settings["rule_1"]
+    rule_2=settings["rule_2"]
+    rule_3=settings["rule_3"]
+    complete_prompt_for_tile_search=text_to_search_the_title + "\n" + rule_1 + "\n" + rule_2 + "\n" + rule_3
+    prompt_for_question_generation =settings["prompt_for_question_generation"]
 
+    # Prima fase: Concatenazione dei chunks e creazione dei titoli
+    for i in range(0, len(chunks), n_of_chunk_for_one_title):
+        # Seleziona un gruppo di n chunk
+        chunk_group = chunks[i:i + n_of_chunk_for_one_title]
+        # Concatena il contenuto di ogni chunk nel gruppo
+        concatenated_content = ''.join(chunk.page_content for chunk in chunk_group)
+        concatenated_chunks_list.append(concatenated_content)
+
+        # Genera un titolo per il contenuto concatenato
+        title = cat.llm(f"{complete_prompt_for_tile_search}\n Testo: \n {concatenated_content}")
+        
+        # Aggiunge il titolo come metadato a ciascun chunk nel gruppo
+        for chunk in chunk_group:
+            chunk.metadata['titles'] = [title]
+            chunk.page_content= title + ":\n" + chunk.page_content
+            questions=cat.llm(f"{prompt_for_question_generation}\n {chunk.page_content}")
+            chunk.page_content=chunk.page_content+ ":\n\n" + questions
+    
     return chunks
+
+    # La funzione ora modifica direttamente i metadati dei chunk in 'chunks'
