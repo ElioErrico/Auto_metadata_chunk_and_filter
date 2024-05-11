@@ -1,5 +1,5 @@
-
 from cat.mad_hatter.decorators import hook
+from langchain.docstore.document import Document
 
 @hook
 def after_rabbithole_splitted_text(chunks, cat):
@@ -21,18 +21,27 @@ def after_rabbithole_splitted_text(chunks, cat):
         chunk_group = chunks[i:i + n_of_chunk_for_one_title]
         # Concatena il contenuto di ogni chunk nel gruppo
         concatenated_content = ''.join(chunk.page_content for chunk in chunk_group)
-        concatenated_chunks_list.append(concatenated_content)
-
+        concatenated_chunks_list.append(concatenated_content)        
+        
         # Genera un titolo per il contenuto concatenato
         title = cat.llm(f"{complete_prompt_for_tile_search}\n Testo: \n {concatenated_content}")
         
+        metadata_of_the_new_doc = {}  # It's important to explicitly define a new dictionary.
+        metadata_of_the_new_doc['titles'] = title
+
+        concatenated_content=title + ":\n" +concatenated_content
+        questions=cat.llm(f"{prompt_for_question_generation}\n {concatenated_content}")
+        concatenated_content= concatenated_content + ":\n\n" + questions
+        concatenated_new_document = Document(page_content=concatenated_content, metadata=metadata_of_the_new_doc )
+
         # Aggiunge il titolo come metadato a ciascun chunk nel gruppo
         for chunk in chunk_group:
             chunk.metadata['titles'] = [title]
             chunk.page_content= title + ":\n" + chunk.page_content
             questions=cat.llm(f"{prompt_for_question_generation}\n {chunk.page_content}")
             chunk.page_content=chunk.page_content+ ":\n\n" + questions
+            concatenated_chunks_list.append(chunk.metadata)
+        
+        chunks.append(concatenated_new_document) 
     
     return chunks
-
-    # La funzione ora modifica direttamente i metadati dei chunk in 'chunks'
