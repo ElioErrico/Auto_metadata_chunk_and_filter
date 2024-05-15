@@ -1,8 +1,0 @@
-{
-    "text_to_search_the_title": "Concentrati e individua un titolo conciso di 4 parole che descriva al meglio il seguente testo. Per individuare il titolo utilizza le seguenti regole:",
-    "rule_1": "1) Se nel testo \u00e8 citato un errore, includi nel titolo il numero dell'errore (Non confondere il numero)",
-    "rule_2": "2) Se nel testo non \u00e8 citato alcun errore non includere il numero dell'errore",
-    "rule_3": "3) Il titolo deve includere le parole chiave contenute nel testo",
-    "n_of_chunk_for_one_title": 5,
-    "prompt_for_question_generation": "Genera 2 domande molto concise la cui risposta \u00e8 contenuta nel seguente testo (per creare le domande fai riferimento al titolo):"
-}
