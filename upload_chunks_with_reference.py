@@ -13,9 +13,19 @@ def save_list_to_json(data_list, filename, path="list_of_titles"):
     # Crea il percorso completo del file
     full_path = os.path.join(path, filename)
     
-    # Scrivi la lista nel file JSON
+    # Leggi i dati esistenti se il file esiste
+    if os.path.exists(full_path):
+        with open(full_path, 'r') as file:
+            existing_data = json.load(file)
+        # Aggiungi i nuovi dati alla lista esistente
+        existing_data.extend(data_list)
+    else:
+        # Altrimenti, usa la nuova lista come dati da salvare
+        existing_data = data_list
+    
+    # Scrivi la lista aggiornata nel file JSON
     with open(full_path, 'w') as file:
-        json.dump(data_list, file)
+        json.dump(existing_data, file)
 
 def read_list_from_json(filename, path="list_of_titles"):
     # Crea il percorso completo del file
@@ -23,7 +33,7 @@ def read_list_from_json(filename, path="list_of_titles"):
     
     # Verifica se il file esiste e non è vuoto
     if not os.path.exists(full_path) or os.path.getsize(full_path) == 0:
-        return []  # Ritorna una lista vuota se il file non esiste o è vuoto
+        return ["nessuna classificazione"]  # Ritorna una lista vuota se il file non esiste o è vuoto
     
     # Leggi il contenuto del file JSON e ritorna la lista
     with open(full_path, 'r') as file:
@@ -31,7 +41,7 @@ def read_list_from_json(filename, path="list_of_titles"):
             data_list = json.load(file)
         except json.JSONDecodeError:
             # Gestisci il caso in cui il file non è un JSON valido
-            return []
+            return ["nessuna classificazione"]
 
     return data_list 
 
@@ -70,7 +80,6 @@ def after_cat_bootstrap(cat):
 def before_cat_recalls_declarative_memories(declarative_recall_config, cat):
     
     global list_of_titles
-
     # call chat history
     chat_history=cat.working_memory.history
     # let's classify the chat history based on json tags
@@ -89,7 +98,8 @@ def after_rabbithole_splitted_text(chunks, cat):
     #load settings and set n° of chunk to aggregrate in order to find the correct tag of each chunk without forget the context
     settings = cat.mad_hatter.get_plugin().load_settings()
     n_of_chunk_for_one_title = settings["n_of_chunk_for_one_title"]
-
+    create_tag_with_prompt=settings["create_tag_with_prompt"]
+    
     for i in range(0, len(chunks), n_of_chunk_for_one_title):
         # Select each chunk group
         chunk_group = chunks[i:i + n_of_chunk_for_one_title]
@@ -98,8 +108,18 @@ def after_rabbithole_splitted_text(chunks, cat):
         concatenated_chunks_list.append(concatenated_content)        
         
         # Generate a title based on concatenated chunk and settings
-        title = cat.classify(concatenated_content, labels=list_of_titles)
-        
+        if create_tag_with_prompt==False:
+            title = cat.classify(concatenated_content, labels=list_of_titles)
+        else:
+            #TODO: Controllare questa parte
+            search_for_title_prompt=settings["search_for_title_prompt"]
+            title = cat.classify(concatenated_content, labels=list_of_titles)
+            if title=="nessuna classificazione":
+                title = cat.llm(search_for_title_prompt +"\n"+ concatenated_content)
+                list_of_titles.append(title)
+
+            save_list_to_json(list_of_titles,"list_of_tags.json")
+
         # Generates metadata title for the new doc
         metadata_of_the_new_doc = {}
         metadata_of_the_new_doc['titles'] = title
