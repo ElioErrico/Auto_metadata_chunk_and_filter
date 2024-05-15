@@ -1,8 +1,7 @@
 {
-    "name": "upload chunks with references",
-    "version": "0.0.1",
-    "description": "upload chunks with references",
-    "author_name": "Elio Errico",
-    "plugin_url": "https://github.com/my_name/my_plugin",
-    "tags": "retrival, chunks, rabbit hole"
+
+    "name": "CAT upload chunk with reference title v3",
+
+    "description": "upload chunk with reference title v3"
+
 }
