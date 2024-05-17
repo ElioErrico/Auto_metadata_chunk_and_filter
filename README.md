@@ -15,8 +15,8 @@ b) filter your documents filters by metadata.
 
 # How to use it:
 
-a) edit the list_of_tags.json with the keywords of your document
-b) the cat will classify your documentation with the list of the keywords (if you don't edit list_of_tags.json the cat will create the metadata)
-c) upload the document
-d) chat with the cat
+1) edit the list_of_tags.json with the keywords of your document
+2) the cat will classify your documentation with the list of the keywords (if you don't edit list_of_tags.json the cat will create the metadata)
+3) upload the document
+4) chat with the cat
 
