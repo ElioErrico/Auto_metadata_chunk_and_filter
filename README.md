@@ -1,8 +1,8 @@
 # Auto metadata chunk and filter
 
 This plugin:
-a) classify your documents with metadata 
-b) filter your documents filters by metadata.
+1) classify your documents with metadata 
+2) filter your documents filters by metadata.
 
 # How it works???
 
