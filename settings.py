@@ -8,11 +8,7 @@ class MySettings(BaseModel):
     create_tag_with_prompt: bool =True
     search_for_title_prompt: str = Field(
     title="Search for title prompt",
-    default="""Concentrati e individua un titolo conciso di 4 parole che descriva al meglio il seguente testo. Per individuare il titolo utilizza le seguenti regole:\n
-1) Se nel testo è citato un errore, includi nel titolo il numero dell'errore (Non confondere il numero)\n
-2) Se nel testo non è citato alcun errore non includere il numero dell'errore\n
-3) Il titolo deve includere le parole chiave contenute nel testo
-""",
+    default="""Take a deep breath and create a 2 words title for the following context. Use Keywords!\n""",
         extra={"type": "TextArea"},
     )
 
