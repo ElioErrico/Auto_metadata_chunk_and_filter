@@ -1,7 +1,8 @@
 {
-
-    "name": "CAT upload chunk with reference title v3",
-
-    "description": "upload chunk with reference title v3"
-
+    "name": "Auto generate metadata and auto filter",
+    "version": "1.6.1",
+    "description": "This plugin:\n 1) classify your documents with metadata\n2) filter your documents filters by metadata.\n How to use it:\n 1)edit the list_of_tags.json with the keywords of your document\n 2) the cat will classify your documentation with the list of the keywords (if you don't edit list_of_tags.json the cat will create the metadata)\n 3) upload the document 4) chat with the cat",
+    "author_name": "Elio Errico",
+    "plugin_url": "https://github.com/ElioErrico/Auto_metadata_chunk_and_filter",
+    "tags": "cat, chunk_size, rabbithole, metadata, filtering, retrival"
 }
