@@ -1,7 +1,22 @@
-# Chunk with references
+# Auto metadata chunk and filter
 
-[![awesome plugin](https://custom-icon-badges.demolab.com/static/v1?label=&message=awesome+plugin&color=383938&style=for-the-badge&logo=cheshire_cat_ai)](https://)  
-[![Awesome plugin](https://custom-icon-badges.demolab.com/static/v1?label=&message=Awesome+plugin&color=000000&style=for-the-badge&logo=cheshire_cat_ai)](https://)  
-[![awesome plugin](https://custom-icon-badges.demolab.com/static/v1?label=&message=awesome+plugin&color=F4F4F5&style=for-the-badge&logo=cheshire_cat_black)](https://)
+This plugin:
+a) classify your documents with metadata 
+b) filter your documents filters by metadata.
 
-Use this plugin to upload chunks with references 
+# How it works???
+
+1) Concatenates a parameterizable number of chunks (set the number in settings)
+2) Reads the possible metadata in list_of_tags.json (You could edit the list depending on your documentation, Do not cancel "no classification" from the list)
+3) Evaluates what is the correct metadata for each chunk analizing the concatenated content and classifies it using the list in list_of_tags.json
+5) Upload each chunk that composes the concatenated content with the discoreved metadada
+6) If the cat cannot find the correct metadata, generates a possible metadata of the chunk (set the prompt and/or disable this function from settings)
+7) Before recalling declarative memory analyses and classifies the chat_history using same list_of_tags.json and filters the documentation
+
+# How to use it:
+
+a) edit the list_of_tags.json with the keywords of your document
+b) the cat will classify your documentation with the list of the keywords (if you don't edit list_of_tags.json the cat will create the metadata)
+c) upload the document
+d) chat with the cat
+
