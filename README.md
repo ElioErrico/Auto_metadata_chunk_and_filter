@@ -4,7 +4,7 @@ This plugin:
 1) classify your documents with metadata 
 2) filter your documents filters by metadata.
 
-# How it works???
+## How it works???
 
 1) Concatenates a parameterizable number of chunks (set the number in settings)
 2) Reads the possible metadata in list_of_tags.json (You could edit the list depending on your documentation, Do not cancel "no classification" from the list)
@@ -14,7 +14,7 @@ This plugin:
 7) Before recalling declarative memory analyses and classifies the chat_history using same list_of_tags.json and filters the documentation
 8) If you want you can add your metadata directly as an input avoiding the CAT to classify the DOC (to be setted in settings)
 
-# How to use it:
+## How to use it:
 
 1) edit the list_of_tags.json with the keywords of your document
 2) the cat will classify your documentation with the list of the keywords (if you don't edit list_of_tags.json the cat will create the metadata)
