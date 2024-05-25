@@ -9,8 +9,9 @@ class MySettings(BaseModel):
     search_for_title_prompt: str = Field(
     title="Search for title prompt",
     default="""Take a deep breath and create a 2 words title for the following context. Use Keywords!\n""",
-        extra={"type": "TextArea"},
-    )
+        extra={"type": "TextArea"},)
+    upload_document_with_following_tag: bool =False
+    tag_to_archive_in_metadata: str
 
 @plugin
 def settings_schema():
