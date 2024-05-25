@@ -1,7 +1,7 @@
 {
     "name": "Auto generate metadata and auto filter",
     "version": "1.6.1",
-    "description": "This plugin:\n 1) classify your documents with metadata\n2) filter your documents filters by metadata.\n How to use it:\n 1)edit the list_of_tags.json with the keywords of your document\n 2) the cat will classify your documentation with the list of the keywords (if you don't edit list_of_tags.json the cat will create the metadata)\n 3) upload the document 4) chat with the cat",
+    "description": "This plugin automatically classifies and filters documents using metadata. It concatenates chunks of content based on settings, analyzes them to assign metadata from 'list_of_tags.json' (which you can edit), and uploads each chunk with its metadata. If it can't find suitable metadata, it generates a new one. You can also manually input metadata to bypass automatic classification. Usage involves editing 'list_of_tags.json' with relevant keywords, uploading the document, and enabling the plugin to classify or directly inputting metadata as needed.",
     "author_name": "Elio Errico",
     "plugin_url": "https://github.com/ElioErrico/Auto_metadata_chunk_and_filter",
     "tags": "cat, chunk_size, rabbithole, metadata, filtering, retrival"
