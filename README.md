@@ -12,11 +12,13 @@ This plugin:
 5) Upload each chunk that composes the concatenated content with the discoreved metadada
 6) If the cat cannot find the correct metadata, generates a possible metadata of the chunk (set the prompt and/or disable this function from settings)
 7) Before recalling declarative memory analyses and classifies the chat_history using same list_of_tags.json and filters the documentation
+8) If you want you can add your metadata directly as an input avoiding the CAT to classify the DOC (to be setted in settings)
 
 # How to use it:
 
 1) edit the list_of_tags.json with the keywords of your document
 2) the cat will classify your documentation with the list of the keywords (if you don't edit list_of_tags.json the cat will create the metadata)
-3) upload the document
-4) chat with the cat
+3) If you want you can add your metadata directly as an input avoiding the CAT to classify the DOC
+4) upload the document
+5) chat with the cat
 
