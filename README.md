@@ -22,3 +22,4 @@ This plugin:
 4) upload the document
 5) chat with the cat
 
+![image](https://github.com/ElioErrico/Auto_metadata_chunk_and_filter/assets/143315119/5e9c4d53-8682-4f06-a133-05f64edc1300)
