@@ -4,7 +4,7 @@ import os
 import json
 
 
-def save_list_to_json(data_list, filename, path):
+def save_json(datas, filename, path):
     # Assicurati che il percorso esista, altrimenti crealo
     if not os.path.exists(path):
         os.makedirs(path)
@@ -14,9 +14,9 @@ def save_list_to_json(data_list, filename, path):
     
     # Scrivi la lista aggiornata nel file JSON
     with open(full_path, 'w') as file:
-        json.dump(data_list, file)
+        json.dump(datas, file)
 
-def read_list_from_json(filename, path):
+def read_json(filename, path):
     # Crea il percorso completo del file
     full_path = os.path.join(path, filename)
     
@@ -27,12 +27,12 @@ def read_list_from_json(filename, path):
     # Leggi il contenuto del file JSON e ritorna la lista
     with open(full_path, 'r') as file:
         try:
-            data_list = json.load(file)
+            datas = json.load(file)
         except json.JSONDecodeError:
             # Gestisci il caso in cui il file non è un JSON valido
             return ["no classification"]
 
-    return data_list 
+    return datas 
 
 def stampa(testo, nome_file, path):
     """
@@ -69,20 +69,24 @@ def after_cat_bootstrap(cat):
 
     # read from json file the possible tags
     directory=get_current_directory()
-    list_of_titles=read_list_from_json("list_of_tags.json",directory)
-    stampa(str(list_of_titles),"list_of_titles.txt",directory)
+    list_of_titles=read_json("list_of_tags.json",directory)
 
 @hook
 def before_cat_recalls_declarative_memories(declarative_recall_config, cat):
     directory=get_current_directory()
-    list_of_titles=read_list_from_json("list_of_tags.json",directory)
-    # call chat history
-    chat_history=cat.working_memory.history
-    # let's classify the chat history based on json tags
-    metadata_to_be_filtered= cat.classify(chat_history, labels=list_of_titles)
-    # filter the documentation based on classified chat hisotry tag
-    if "no classification" in metadata_to_be_filtered:
-        return declarative_recall_config
+    list_of_titles=read_json("list_of_tags.json",directory)
+    
+    # call chat history and user message
+    user_message=cat.working_memory.user_message_json["text"]
+
+    stringify_chat_history=cat.stringify_chat_history(latest_n=2)
+
+    metadata_to_be_filtered=cat.classify(user_message, labels=list_of_titles)
+    if "no classification" in metadata_to_be_filtered:        
+        metadata_to_be_filtered= cat.classify(stringify_chat_history, labels=list_of_titles)        
+        if "no classification" in metadata_to_be_filtered:
+            return declarative_recall_config
+        
     declarative_recall_config["metadata"] = {"titles": metadata_to_be_filtered}
     return declarative_recall_config
 
@@ -92,10 +96,11 @@ def after_rabbithole_splitted_text(chunks, cat):
     #create list o concatenated chunks
     concatenated_chunks_list = []
     directory=get_current_directory()
-    list_of_titles=read_list_from_json("list_of_tags.json",directory)
+    list_of_titles=read_json("list_of_tags.json",directory)
     
     #load settings and set n° of chunk to aggregrate in order to find the correct tag of each chunk without forget the context
     settings = cat.mad_hatter.get_plugin().load_settings()
+
     n_of_chunk_for_one_title = settings["n_of_chunk_for_one_title"]
     create_tag_with_prompt=settings["create_tag_with_prompt"]
     
@@ -116,7 +121,8 @@ def after_rabbithole_splitted_text(chunks, cat):
                 title = cat.llm(search_for_title_prompt +"\n"+ concatenated_content)
                 list_of_titles.append(title)
                 list_of_titles=list(set(list_of_titles))
-                save_list_to_json(list_of_titles,"list_of_tags.json",directory)
+                save_json(list_of_titles,"list_of_tags.json",directory)
+
 
         # Generates metadata title for the new doc
         metadata_of_the_new_doc = {}
@@ -131,4 +137,3 @@ def after_rabbithole_splitted_text(chunks, cat):
             concatenated_chunks_list.append(chunk.metadata)
 
     return chunks
-
