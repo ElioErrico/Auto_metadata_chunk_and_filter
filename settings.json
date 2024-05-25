@@ -1,6 +1,7 @@
 {
     "n_of_chunk_for_one_title": 5,
     "create_tag_with_prompt":true,
-    "search_for_title_prompt": "Take a deep breath and create a 2 words title for the following context. Use Keywords!"
-    
+    "search_for_title_prompt": "Take a deep breath and create a 2 words title for the following context. Use Keywords!",
+    "upload_document_with_following_tag": true,
+    "tag_to_archive_in_metadata": "Insert your Metadata here for direct input metadata"
 }
