@@ -11,7 +11,7 @@ class MySettings(BaseModel):
     default="""Take a deep breath and create a 2 words title for the following context. Use Keywords!\n""",
         extra={"type": "TextArea"},)
     upload_document_with_following_tag: bool =False
-    tag_to_archive_in_metadata: str """Insert your Metadata here for direct input metadata"""
+    tag_to_archive_in_metadata: str = """Insert your Metadata here for direct input metadata"""
 
 @plugin
 def settings_schema():
