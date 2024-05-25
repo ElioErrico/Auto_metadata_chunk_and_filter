@@ -24,7 +24,7 @@ def read_json(filename, path):
     
     # Verifica se il file esiste e non è vuoto
     if not os.path.exists(full_path) or os.path.getsize(full_path) == 0:
-        return ["nessuna classificazione"]  # Ritorna una lista vuota se il file non esiste o è vuoto
+        return ["no classification"]  # Ritorna una lista vuota se il file non esiste o è vuoto
     
     # Leggi il contenuto del file JSON e ritorna la lista
     with open(full_path, 'r') as file:
@@ -32,7 +32,7 @@ def read_json(filename, path):
             datas = json.load(file)
         except json.JSONDecodeError:
             # Gestisci il caso in cui il file non è un JSON valido
-            return ["nessuna classificazione"]
+            return ["no classification"]
 
     return datas 
 
@@ -85,9 +85,9 @@ def before_cat_recalls_declarative_memories(declarative_recall_config, cat):
     stringify_chat_history=cat.stringify_chat_history(latest_n=2)
 
     metadata_to_be_filtered=cat.classify(user_message, labels=list_of_titles)
-    if "nessuna classificazione" in metadata_to_be_filtered:        
+    if "no classification" in metadata_to_be_filtered:        
         metadata_to_be_filtered= cat.classify(stringify_chat_history, labels=list_of_titles)        
-        if "nessuna classificazione" in metadata_to_be_filtered:
+        if "no classification" in metadata_to_be_filtered:
             return declarative_recall_config
         
     declarative_recall_config["metadata"] = {"titles": metadata_to_be_filtered}
@@ -163,7 +163,7 @@ def after_rabbithole_splitted_text(chunks, cat):
             title = cat.classify(concatenated_content, labels=list_of_titles)
         elif create_tag_with_prompt==True and upload_document_with_following_tag==False:
             title = cat.classify(concatenated_content, labels=list_of_titles)
-            if "nessuna classificazione" in title :
+            if "no classification" in title :
                 title = cat.llm(search_for_title_prompt +"\n"+ concatenated_content)
                 list_of_titles.append(title)
                 list_of_titles=list(set(list_of_titles))
