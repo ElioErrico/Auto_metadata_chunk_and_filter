@@ -1,4 +1,4 @@
-from cat.mad_hatter.decorators import hook
+from cat.mad_hatter.decorators import hook,plugin
 from langchain.docstore.document import Document
 import os
 import json
@@ -16,13 +16,15 @@ def save_json(datas, filename, path):
     with open(full_path, 'w') as file:
         json.dump(datas, file)
 
+    
+
 def read_json(filename, path):
     # Crea il percorso completo del file
     full_path = os.path.join(path, filename)
     
     # Verifica se il file esiste e non è vuoto
     if not os.path.exists(full_path) or os.path.getsize(full_path) == 0:
-        return ["no classification"]  # Ritorna una lista vuota se il file non esiste o è vuoto
+        return ["nessuna classificazione"]  # Ritorna una lista vuota se il file non esiste o è vuoto
     
     # Leggi il contenuto del file JSON e ritorna la lista
     with open(full_path, 'r') as file:
@@ -30,7 +32,7 @@ def read_json(filename, path):
             datas = json.load(file)
         except json.JSONDecodeError:
             # Gestisci il caso in cui il file non è un JSON valido
-            return ["no classification"]
+            return ["nessuna classificazione"]
 
     return datas 
 
@@ -66,10 +68,11 @@ def get_current_directory():
 
 @hook
 def after_cat_bootstrap(cat):
-
+    
     # read from json file the possible tags
     directory=get_current_directory()
     list_of_titles=read_json("list_of_tags.json",directory)
+    
 
 @hook
 def before_cat_recalls_declarative_memories(declarative_recall_config, cat):
@@ -82,13 +85,53 @@ def before_cat_recalls_declarative_memories(declarative_recall_config, cat):
     stringify_chat_history=cat.stringify_chat_history(latest_n=2)
 
     metadata_to_be_filtered=cat.classify(user_message, labels=list_of_titles)
-    if "no classification" in metadata_to_be_filtered:        
+    if "nessuna classificazione" in metadata_to_be_filtered:        
         metadata_to_be_filtered= cat.classify(stringify_chat_history, labels=list_of_titles)        
-        if "no classification" in metadata_to_be_filtered:
+        if "nessuna classificazione" in metadata_to_be_filtered:
             return declarative_recall_config
         
     declarative_recall_config["metadata"] = {"titles": metadata_to_be_filtered}
     return declarative_recall_config
+
+
+@plugin
+def save_settings(settings):
+
+    directory=get_current_directory()
+    old_settings=read_json("settings.json", directory)
+    
+    if settings["upload_document_with_following_tag"] != old_settings["upload_document_with_following_tag"]:
+
+        if settings["upload_document_with_following_tag"]==False and settings["create_tag_with_prompt"]==False:
+            settings["upload_document_with_following_tag"]=False
+            settings["create_tag_with_prompt"]=False
+            save_json(settings, "settings.json", directory)
+            return settings
+        elif old_settings["upload_document_with_following_tag"]==False and old_settings["create_tag_with_prompt"]==False and settings["upload_document_with_following_tag"]==True and settings["create_tag_with_prompt"]==True:
+            settings["upload_document_with_following_tag"]=False
+            settings["create_tag_with_prompt"]=True
+            save_json(settings, "settings.json", directory)             
+        else:
+            settings["create_tag_with_prompt"] = not settings["upload_document_with_following_tag"]
+
+    elif settings["create_tag_with_prompt"] != old_settings["create_tag_with_prompt"]:
+
+        if settings["upload_document_with_following_tag"]==False and settings["create_tag_with_prompt"]==False:
+            settings["upload_document_with_following_tag"]=False
+            settings["create_tag_with_prompt"]=False
+            save_json(settings, "settings.json", directory)            
+            return settings
+        elif old_settings["upload_document_with_following_tag"]==False and old_settings["create_tag_with_prompt"]==False and settings["upload_document_with_following_tag"]==True and settings["create_tag_with_prompt"]==True:
+            settings["upload_document_with_following_tag"]=False
+            settings["create_tag_with_prompt"]=True
+            save_json(settings, "settings.json", directory)  
+        else:       
+            settings["upload_document_with_following_tag"] = not settings["create_tag_with_prompt"]
+
+    save_json(settings, "settings.json", directory)
+
+    return settings
+
 
 @hook
 def after_rabbithole_splitted_text(chunks, cat):
@@ -103,7 +146,11 @@ def after_rabbithole_splitted_text(chunks, cat):
 
     n_of_chunk_for_one_title = settings["n_of_chunk_for_one_title"]
     create_tag_with_prompt=settings["create_tag_with_prompt"]
-    
+    search_for_title_prompt=settings["search_for_title_prompt"]
+
+    upload_document_with_following_tag=settings["upload_document_with_following_tag"]
+    tag_to_archive_in_metadata=settings["tag_to_archive_in_metadata"]
+
     for i in range(0, len(chunks), n_of_chunk_for_one_title):
         # Select each chunk group
         chunk_group = chunks[i:i + n_of_chunk_for_one_title]
@@ -112,17 +159,20 @@ def after_rabbithole_splitted_text(chunks, cat):
         concatenated_chunks_list.append(concatenated_content)        
         
         # Generate a title based on concatenated chunk and settings
-        if create_tag_with_prompt==False:
+        if create_tag_with_prompt==False and upload_document_with_following_tag==False:
             title = cat.classify(concatenated_content, labels=list_of_titles)
-        else:
-            search_for_title_prompt=settings["search_for_title_prompt"]
+        elif create_tag_with_prompt==True and upload_document_with_following_tag==False:
             title = cat.classify(concatenated_content, labels=list_of_titles)
-            if "no classification" in title :
+            if "nessuna classificazione" in title :
                 title = cat.llm(search_for_title_prompt +"\n"+ concatenated_content)
                 list_of_titles.append(title)
                 list_of_titles=list(set(list_of_titles))
                 save_json(list_of_titles,"list_of_tags.json",directory)
-
+        elif create_tag_with_prompt==False and upload_document_with_following_tag==True:
+                title = tag_to_archive_in_metadata
+                list_of_titles.append(title)
+                list_of_titles=list(set(list_of_titles))
+                save_json(list_of_titles,"list_of_tags.json",directory)
 
         # Generates metadata title for the new doc
         metadata_of_the_new_doc = {}
