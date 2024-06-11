@@ -84,12 +84,15 @@ def before_cat_recalls_declarative_memories(declarative_recall_config, cat):
 
     stringify_chat_history=cat.stringify_chat_history(latest_n=2)
 
-    metadata_to_be_filtered=cat.classify(user_message, labels=list_of_titles)
-    if "no classification" in metadata_to_be_filtered:        
-        metadata_to_be_filtered= cat.classify(stringify_chat_history, labels=list_of_titles)        
-        if "no classification" in metadata_to_be_filtered:
-            return declarative_recall_config
-        
+# NOT WORKING SO GOOD TO KEEP TRACK OF DISCUSSIONS
+#    metadata_to_be_filtered=cat.classify(user_message, labels=list_of_titles)
+#    if "no classification" in metadata_to_be_filtered:        
+#        metadata_to_be_filtered= cat.classify(stringify_chat_history, labels=list_of_titles)        
+#        if "no classification" in metadata_to_be_filtered:
+#            return declarative_recall_config
+    
+    metadata_to_be_filtered= cat.classify(stringify_chat_history, labels=list_of_titles)        
+    
     declarative_recall_config["metadata"] = {"titles": metadata_to_be_filtered}
     return declarative_recall_config
 
