@@ -1,5 +1,8 @@
 from cat.mad_hatter.decorators import hook,plugin
 from langchain.docstore.document import Document
+
+from cat.log import log
+
 import os
 import json
 
@@ -92,6 +95,7 @@ def before_cat_recalls_declarative_memories(declarative_recall_config, cat):
 #            return declarative_recall_config
     
     metadata_to_be_filtered= cat.classify(stringify_chat_history, labels=list_of_titles)        
+    log.critical(f'I will filter the documentation with the following metadata "titles":"{metadata_to_be_filtered}"')
     
     declarative_recall_config["metadata"] = {"titles": metadata_to_be_filtered}
     return declarative_recall_config
@@ -180,6 +184,7 @@ def after_rabbithole_splitted_text(chunks, cat):
         # Generates metadata title for the new doc
         metadata_of_the_new_doc = {}
         metadata_of_the_new_doc['titles'] = title
+        log.critical(f'Document uploaded with "titles" metadata: "{title}"')
         # Add to the documents to be uploaded the whole concatenated document 
         concatenated_new_document = Document(page_content=concatenated_content, metadata=metadata_of_the_new_doc )
         chunks.append(concatenated_new_document)
